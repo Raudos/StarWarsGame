@@ -1,6 +1,8 @@
 // Variables
 var canvas = document.getElementById("myCanvas");
 var backgroundCanvas = document.getElementById("bgCanvas");
+var playerCanvas = document.getElementById("playerCanvas");
+var player = playerCanvas.getContext("2d");
 var bg = backgroundCanvas.getContext("2d");
 var ctx = canvas.getContext("2d");
 var rightPressed = false;
@@ -8,6 +10,15 @@ var leftPressed = false;
 var topPressed = false;
 var bottomPressed = false;
 var spacePressed = false;
+
+// Player data
+var playerWidth = 250;
+var playerHeight = 85;
+var nbrOfLifes = 4; // Its -1, really
+var lifeWidth = 105;
+var lifeHeight = 40;
+var warningWidth = 280;
+var warningHeight = 100;
 
 // Background data
 var bgHTimes = 3;
@@ -31,8 +42,8 @@ var nbrOfShots = 0;
 // Tie Fighter data 
 var tieX = 120;
 var tieY = 0;
-var tieWidth = 25;
-var tieHeight = 25;
+var tieWidth = 24;
+var tieHeight = 24;
 
 // Images
 var xWing = new Image();
@@ -43,6 +54,15 @@ tie.src = 'css/images/tief.png';
 
 var bgImg = new Image();
 bgImg.src = 'css/images/bg.jpg';
+
+var playerImg = new Image();
+playerImg.src = 'css/images/pilot.png';
+
+var playerLife = new Image();
+playerLife.src = 'css/images/r2d2.png';
+
+var warning = new Image();
+warning.src = 'css/images/warning.png';
 
 
 // Event listeners
@@ -86,13 +106,28 @@ function keyUpHandler(e) {
 	}
 }
 
+// Player
+
+function drawPlayer() {
+	player.drawImage(playerImg, 20, 0, playerWidth, playerHeight);
+}
+
+function drawLife() {
+	for (var i = 1; nbrOfLifes > i; i++) {
+		player.drawImage(playerLife, lifeWidth * i - lifeWidth, playerHeight + 	10, lifeWidth, lifeHeight);
+	}
+	if (nbrOfLifes == 1) {
+		player.drawImage(warning, 10, playerHeight - 20, warningWidth, warningHeight); // Why -20 you ask? Because of reasons (which i know nothing of)
+	}
+}
+
 // Background
 var bgArray = [];
 
-function addBg() { // NO FUCKING CLUE, smth with array Y posiion
+function addBg() { 
 	for (var i = 1; bgWTimes >= i; i++ ) {
 		for (var j = 1; bgHTimes >= j; j++ ) {
-			if (bgArray.length < 9) {  //You fucked this up, it cant be i*j as it is still going
+			if (bgArray.length < bgHTimes * bgWTimes) {  // Remember that empty background? Yep, this line
 				var test = [bgWidth * i - bgWidth, bgHeight * j - 2 * bgHeight];
 				bgArray.push(test);
 			}
@@ -171,7 +206,7 @@ function drawTLaser() {
 		if (tieLasers[i][1] < canvas.height) {
 			ctx.beginPath();
 			ctx.rect(tieLasers[i][0], tieLasers[i][1], 1, 4);
-			ctx.fillStyle = "green";
+			ctx.fillStyle = "rgb(86,206,82)";
 			ctx.fill();
 			ctx.closePath();
 		} else {
@@ -252,8 +287,13 @@ function tLaserCol() {
 	for (var i = 0; n > i; i++) {
 		if (tieLasers[i][1] >= xWingY && tieLasers[i][1] <= xWingY + xWingHeight) {
 			if (tieLasers[i][0] > xWingX && tieLasers[i][0] < xWingX + xWingWidth) {
-				alert("You got shot by the Tie Fighter!");
-				document.location.reload();
+				if (nbrOfLifes > 1) {
+					tieLasers.splice(i, 1);
+					nbrOfLifes -= 1;
+				} else {
+					alert("You lose.");
+					document.location.reload();
+				}
 			}
 		}
 	}
@@ -288,6 +328,9 @@ function xWingCol() {
 // Draw
 function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	player.clearRect(0, 0, canvas.width, canvas.height);
+	drawPlayer();
+	drawLife();
 	addBg();
 	drawBg();
 	moveBg();
