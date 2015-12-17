@@ -1,0 +1,18 @@
+#myCanvas { 
+	background: transparent;
+	border: 1px solid black;
+	width: 70%;
+	height: 95%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+#bgCanvas {
+	width: 70%;
+	height: 95%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
