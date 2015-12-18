@@ -46,6 +46,8 @@ var tieWidth = 24;
 var tieHeight = 24;
 var tieLeftWidth = 28;
 var tieLeftHeight = 28;
+var tieRightWidth = 28;
+var tieRightHeight = 28;
 
 // Images
 var xWing = new Image();
@@ -69,6 +71,8 @@ warning.src = 'css/images/warning.png';
 var tieLeft = new Image();
 tieLeft.src = 'css/images/tief_left.png';
 
+var tieRight = new Image();
+tieRight.src = 'css/images/tief_right.png';
 
 // Event listeners
 document.addEventListener("keydown", keyDownHandler, false);
@@ -165,10 +169,13 @@ tieLeftSquadron = [];
 function drawLeftTie() {
 	var n = tieLeftSquadron.length;
 	for (var i = 0; n > i; i++) {
+		tieLeftSquadron[i][1] += 1;
+		tieLeftSquadron[i][0] += 1;
 		if (tieLeftSquadron[i][2] == 1) {
 			ctx.drawImage(tieLeft, tieLeftSquadron[i][0], tieLeftSquadron[i][1], tieLeftWidth, tieLeftHeight);
-			tieLeftSquadron[i][1] += 1;
-			tieLeftSquadron[i][0] += 1;
+		}
+		if (tieLeftSquadron[i][1] >= canvas.height) {
+			tieLeftSquadron.splice(i, 1);
 		}
 	}
 }
@@ -214,7 +221,7 @@ function drawLeftTLaser() {
 	for (var i = 0; n > i; i++) {
 		if (tieLeftLasers[i][1] < canvas.height) {
 			ctx.beginPath();
-			ctx.rect(tieLeftLasers[i][0], tieLeftLasers[i][1], 1, 2);
+			ctx.rect(tieLeftLasers[i][0], tieLeftLasers[i][1], 2, 2);
 			ctx.fillStyle = "rgb(86,206,82)";
 			ctx.fill();
 			ctx.closePath();
@@ -290,6 +297,72 @@ function drawMidTLaser() {
 	}
 }
 
+// Right squadron functions
+tieRightSquadron = [];
+function drawRightTie() {
+	var n = tieRightSquadron.length;
+	for (var i = 0; n > i; i++) {
+		tieRightSquadron[i][0] -= 1;
+		tieRightSquadron[i][1] += 1; //Before drawing so you they actually end up being deleted
+		if (tieRightSquadron[i][2] == 1) {
+			ctx.drawImage(tieRight, tieRightSquadron[i][0], tieRightSquadron[i][1], tieRightWidth, tieRightHeight);
+		}
+		if (tieRightSquadron[i][1] >= canvas.height) {
+			tieRightSquadron.splice(i, 1);
+		}
+	}
+}
+function addRightTie() {
+	var n = canvas.width / 5;
+	var tie = tieRightSquadron.length; // Only 5 ties please!
+	
+	if (tie < 5) {
+		for (var i = 1; 5 >= i; i++) {
+			var t = [canvas.width + tieRightWidth * i * 2, - 150 - tieRightHeight * i, 1, 3]; // Why is it diffrent than left one? No idea | x, y, status, type
+			tieRightSquadron.push(t);
+		}
+	}	
+}
+
+tieRightLasers = [];
+var shotRightTCD = 40;
+function addRightTLaser() {
+	var n = tieRightSquadron.length;
+	if (shotRightTCD >= 40)
+	for (var i = 0; n > i; i++) {
+		if (tieRightSquadron[i][2] == 1) {
+			var tLaserX = tieRightSquadron[i][0] + tieWidth / 2;
+			var tLaserY = tieRightSquadron[i][1] + tieHeight / 2;
+			var tLaserStatus = 1;
+			var tLaserArray = [tLaserX, tLaserY, tLaserStatus];
+			tieRightLasers.push(tLaserArray);
+			shotRightTCD = 0; // Shot reset
+		}
+	}
+}
+
+function moveRightTLaser() {
+	var n = tieRightLasers.length;
+	for (var i = 0; n > i; i++) {
+		tieRightLasers[i][1] += 2;
+		tieRightLasers[i][0] -= 2;
+	}
+}
+
+function drawRightTLaser() {
+	var n = tieRightLasers.length;
+	for (var i = 0; n > i; i++) {
+		if (tieRightLasers[i][1] < canvas.height) {
+			ctx.beginPath();
+			ctx.rect(tieRightLasers[i][0], tieRightLasers[i][1], 2, 2);
+			ctx.fillStyle = "rgb(86,206,82)";
+			ctx.fill();
+			ctx.closePath();
+		} else {
+			tieRightLasers.splice(i, 1);
+		}
+	}
+}
 
 
 // X-Wing Functions.
@@ -373,6 +446,22 @@ function laserLeftCol() {
 	}
 }
 
+// XWing's lasers colision with left ties
+function laserRightCol() {
+	var n = lasersXwing.length;
+	var tie = tieRightSquadron.length;
+	for (var i = 0; n > i; i++) { // Check each right tie
+		for (var j = 0; tie > j; j++) {
+			if (lasersXwing[i][1] <= tieRightSquadron[j][1] + tieHeight && tieRightSquadron[j][2] == 1) {
+				if (lasersXwing[i][0] < tieRightSquadron[j][0] + tieWidth && lasersXwing[i][0] + 2 > tieRightSquadron[j][0]) {
+					tieRightSquadron[j][2] = 0;
+					lasersXwing.splice(i, 1);
+				}
+			}
+		}
+	}
+}
+
 // Colision with middle tie lasers
 function tMidLaserCol() {
 	var n = tieMidLasers.length;
@@ -409,6 +498,23 @@ function tLeftLaserCol() {
 	}
 }
 
+// Colision with right tie lasers
+function tRightLaserCol() {
+	var n = tieRightLasers.length;
+	for (var i = 0; n > i; i++) {
+		if (tieRightLasers[i][1] >= xWingY && tieRightLasers[i][1] <= xWingY + xWingHeight) {
+			if (tieRightLasers[i][0] > xWingX && tieRightLasers[i][0] < xWingX + xWingWidth) {
+				if (nbrOfLifes > 1) {
+					tieRightLasers.splice(i, 1);
+					nbrOfLifes -= 1;
+				} else {
+					alert("You lose.");
+					document.location.reload();
+				}
+			}
+		}
+	}
+}
 
 function moveXwing() {
 	if(rightPressed && canvas.width - xWingWidth > xWingX) {
@@ -449,6 +555,17 @@ function xWingLeftCol() {
 	}
 }
 
+function xWingRightCol() {
+	var tie = tieRightSquadron.length;
+	for (var i = 0; tie > i; i++) {
+		if (xWingY <= tieRightSquadron[i][1] + tieHeight && xWingY >= tieRightSquadron[i][1] && tieRightSquadron[i][2] == 1) {
+			if (xWingX < tieRightSquadron[i][0] + tieWidth && xWingX + xWingWidth > tieRightSquadron[i][0]) {
+				alert("You crashed into the Tie Fighter!");
+				document.location.reload();
+			}
+		}
+	}
+}
 // Draw
 function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -461,6 +578,7 @@ function draw() {
 // XWing colision with ties	
 	xWingMidCol();
 	xWingLeftCol();
+	xWingRightCol();
 	drawXwing();
 // Left Tie functions 
 	addLeftTie();
@@ -469,23 +587,33 @@ function draw() {
 	moveLeftTLaser();
 	drawLeftTLaser();
 // Mid Tie functions
-	//addMidTie();
-	//drawMidTie();
-	//addMidTLaser();
-	//moveMidTLaser();
-	//drawMidTLaser();
-// XWing's colistion with tie lasers
+	addMidTie();
+	drawMidTie();
+	addMidTLaser();
+	moveMidTLaser();
+	drawMidTLaser();
+// Right Tie functions
+	addRightTie();
+	drawRightTie();
+	addRightTLaser();
+	moveRightTLaser();
+	drawRightTLaser();
+// XWing's colision with tie lasers
 	tMidLaserCol();
 	tLeftLaserCol();
+	tRightLaserCol();
 	moveXwing();
 	pressLaser();
 	moveLaser();
 	drawLaser();
+// Destroy ties on XWing's laser colision
 	laserMidCol();
 	laserLeftCol();
-	shotCD += 1;	// Cooldown reset
-	shotMidTCD += 1;	// Cooldown on tie shots
-	shotLeftTCD += 1; // Cooldown on left tie shots
+	laserRightCol();
+	shotCD += 2;	// Cooldown reset on XWing shots
+	shotMidTCD += 0.5;	// Cooldown on tie shots
+	shotLeftTCD += 0.4; // Cooldown on left tie shots
+	shotRightTCD += 0.4; // Cooldown on right tie shots
 }
 
 // vnjksbv
