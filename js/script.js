@@ -531,10 +531,11 @@ function moveXwing() {
 	}
 }
 
+// Colision with ties
 function xWingMidCol() {
 	var tie = tieMidSquadron.length;
 	for (var i = 0; tie > i; i++) {
-		if (xWingY <= tieMidSquadron[i][1] + tieHeight && xWingY >= tieMidSquadron[i][1] && tieMidSquadron[i][2] == 1) {
+		if (xWingY <= tieMidSquadron[i][1] + tieHeight && xWingY + xWingHeight >= tieMidSquadron[i][1] && tieMidSquadron[i][2] == 1) {
 			if (xWingX < tieMidSquadron[i][0] + tieWidth && xWingX + xWingWidth > tieMidSquadron[i][0]) {
 				alert("You crashed into the Tie Fighter!");
 				document.location.reload();
@@ -546,7 +547,7 @@ function xWingMidCol() {
 function xWingLeftCol() {
 	var tie = tieLeftSquadron.length;
 	for (var i = 0; tie > i; i++) {
-		if (xWingY <= tieLeftSquadron[i][1] + tieHeight && xWingY >= tieLeftSquadron[i][1] && tieLeftSquadron[i][2] == 1) {
+		if (xWingY <= tieLeftSquadron[i][1] + tieHeight && xWingY + xWingHeight >= tieLeftSquadron[i][1] && tieLeftSquadron[i][2] == 1) {
 			if (xWingX < tieLeftSquadron[i][0] + tieWidth && xWingX + xWingWidth > tieLeftSquadron[i][0]) {
 				alert("You crashed into the Tie Fighter!");
 				document.location.reload();
@@ -558,7 +559,7 @@ function xWingLeftCol() {
 function xWingRightCol() {
 	var tie = tieRightSquadron.length;
 	for (var i = 0; tie > i; i++) {
-		if (xWingY <= tieRightSquadron[i][1] + tieHeight && xWingY >= tieRightSquadron[i][1] && tieRightSquadron[i][2] == 1) {
+		if (xWingY <= tieRightSquadron[i][1] + tieHeight && xWingY + xWingHeight >= tieRightSquadron[i][1] && tieRightSquadron[i][2] == 1) {
 			if (xWingX < tieRightSquadron[i][0] + tieWidth && xWingX + xWingWidth > tieRightSquadron[i][0]) {
 				alert("You crashed into the Tie Fighter!");
 				document.location.reload();
