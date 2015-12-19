@@ -13,6 +13,14 @@ var topPressed = false;
 var bottomPressed = false;
 var spacePressed = false;
 
+// Boss data
+var bossCondition = 2;
+var bossHealth = 20;
+var bossWidth = 45;
+var bossHeight = 80;
+var bossX = canvas.width / 2 - bossWidth / 2 - 10; // Get centered already, god damn it!
+var bossY = - 200 - bossHeight;
+
 // Player data
 var playerWidth = 250;
 var playerHeight = 85;
@@ -76,6 +84,9 @@ tieLeft.src = 'css/images/tief_left.png';
 var tieRight = new Image();
 tieRight.src = 'css/images/tief_right.png';
 
+var boss = new Image();
+boss.src = 'css/images/cruiser.png';
+
 // Event listeners
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
@@ -117,6 +128,62 @@ function keyUpHandler(e) {
 	}
 }
 
+// Boss
+function drawBoss() {
+	if (bossHealth > 0) {
+		ctx.drawImage(boss, bossX, bossY, bossWidth, bossHeight);
+		if (bossY < 0) {
+			bossY += 1;
+		}
+	}
+}
+bossMidLasers = [];
+var shotBossMidCD = 20;
+function drawBossMidLaser() {
+	var n = bossMidLasers.length;
+	for (var i = 0; n > i; i++) {
+		ctx.beginPath();
+		ctx.rect(bossMidLasers[i][0], bossMidLasers[i][1], 1, 4);
+		ctx.fillStyle = "rgb(86,206,82)";
+		ctx.fill();
+		ctx.closePath();
+		if (bossMidLasers[i][1] >= canvas.height) {
+			bossMidLasers.splice(i, 1);
+		}
+	}
+	
+}
+
+function addBossMidLaser() {
+	if (bossY >= 0 && shotBossMidCD >= 20) {
+		var laserXOne = bossX;
+		var laserYOne = bossY + bossHeight / 2 - 10;
+		var laserXTwo = bossX + 10;
+		var laserYTwo = bossY + bossHeight / 2;
+		var laserXThree = bossX + bossWidth - 10;
+		var laserYThree = bossY + bossHeight / 2;
+		var laserXFour = bossX + bossWidth;
+		var laserYFour = bossY + bossHeight / 2 - 10;
+		var laserStatus = 1
+		var bossLaserArrayOne = [laserXOne, laserYOne, laserStatus];
+		var bossLaserArrayTwo = [laserXTwo, laserYTwo, laserStatus];
+		var bossLaserArrayThree = [laserXThree, laserYThree, laserStatus];
+		var bossLaserArrayFour = [laserXFour, laserYFour, laserStatus];
+		bossMidLasers.push(bossLaserArrayOne);
+		bossMidLasers.push(bossLaserArrayTwo);
+		bossMidLasers.push(bossLaserArrayThree);
+		bossMidLasers.push(bossLaserArrayFour);
+		shotBossMidCD = 0;
+	}
+}
+
+function moveBossMidLaser() {
+	var n = bossMidLasers.length;
+	for (var i = 0; n > i; i++) {
+		bossMidLasers[i][1] += 1;
+	}
+}
+
 // Player
 
 function drawPlayer() {
@@ -155,10 +222,12 @@ function addBg() {
 function moveBg() {
 	var n = bgArray.length;
 	for (var i = 0; n > i; i++) {
-		if (bgArray[i][1] < canvas.height) {
-			bgArray[i][1] += 1;
-		} else {
-			bgArray[i][1] = -75;
+		if (bossY < 0) { // Stop bg movement when boss arrives
+			if (bgArray[i][1] < canvas.height) {
+				bgArray[i][1] += 1;
+			} else {
+				bgArray[i][1] = -75;
+			}
 		}
 	}
 }
@@ -191,7 +260,7 @@ function addLeftTie() {
 	var n = canvas.width / 5;
 	var tie = tieLeftSquadron.length; // Only 5 ties please!
 	
-	if (tie < 5) {
+	if (tie < 5 && pointsX < bossCondition) {
 		for (var i = 1; 5 >= i; i++) {
 			var t = [- tieLeftWidth * i * 2, - 100 - tieLeftHeight * i, 1, 1]; // Magical numbers to adjust it a bit | x, y, status, type
 			tieLeftSquadron.push(t);
@@ -258,7 +327,7 @@ function addMidTie() {
 	var n = canvas.width / 5;
 	var tie = tieMidSquadron.length; // Only 5 ties please!
 	
-	if (tie < 5) {
+	if (tie < 5 && pointsX < bossCondition) {
 		for (var i = 1; 5 >= i; i++) {
 			var t = [n * i - tieWidth * 1.5, -tieHeight, 1, 2]; // 1.5 is to center it a bit, delete later on | x, y, status, type
 			tieMidSquadron.push(t);
@@ -324,7 +393,7 @@ function addRightTie() {
 	var n = canvas.width / 5;
 	var tie = tieRightSquadron.length; // Only 5 ties please!
 	
-	if (tie < 5) {
+	if (tie < 5 && pointsX < bossCondition) {
 		for (var i = 1; 5 >= i; i++) {
 			var t = [canvas.width + tieRightWidth * i * 2, - 150 - tieRightHeight * i, 1, 3]; // Why is it diffrent than left one? No idea | x, y, status, type
 			tieRightSquadron.push(t);
@@ -456,7 +525,7 @@ function laserLeftCol() {
 	}
 }
 
-// XWing's lasers colision with left ties
+// XWing's lasers colision with right ties
 function laserRightCol() {
 	var n = lasersXwing.length;
 	var tie = tieRightSquadron.length;
@@ -468,6 +537,19 @@ function laserRightCol() {
 					lasersXwing.splice(i, 1);
 					pointsX += 1;
 				}
+			}
+		}
+	}
+}
+
+// XWing's laser collision with boss
+function laserBossCol() {
+	var n = lasersXwing.length;
+	for (var i = 0; n > i; i++) {
+		if (lasersXwing[i][1] <= bossY + bossHeight) {
+			if (lasersXwing[i][0] >= bossX && lasersXwing[i][0] <= bossX + bossWidth) {
+				lasersXwing.splice(i, 1);
+				bossHealth -= 1;
 			}
 		}
 	}
@@ -594,6 +676,15 @@ function draw() {
 	xWingLeftCol();
 	xWingRightCol();
 	drawXwing();
+// Boss
+	if (pointsX >= bossCondition) {
+		drawBoss();
+		laserBossCol();
+		drawBossMidLaser();
+		addBossMidLaser();
+		moveBossMidLaser();
+	}
+
 // Left Tie functions 
 	addLeftTie();
 	drawLeftTie();
@@ -615,7 +706,7 @@ function draw() {
 // XWing's colision with tie lasers
 	tMidLaserCol();
 	tLeftLaserCol();
-	tRightLaserCol();
+	tRightLaserCol(); 
 	moveXwing();
 	pressLaser();
 	moveLaser();
@@ -628,7 +719,8 @@ function draw() {
 	shotMidTCD += 0.5;	// Cooldown on tie shots
 	shotLeftTCD += 0.4; // Cooldown on left tie shots
 	shotRightTCD += 0.4; // Cooldown on right tie shots
+	shotBossMidCD += 0.3; // Cooldown on middle boss shots
 }
 
-// vnjksbv
+
 setInterval(draw, 15);
