@@ -21,8 +21,22 @@
 	height: 45%;
 	position: absolute;
 	top: 2%;
-	left: 2%;
+	left: 3%;
 	background: black;
 	border: 5px solid grey;
 	border-radius: 30%;
+}
+#pointsCanvas {
+	width: 18%;
+	height: 30%;
+	position: absolute;
+	bottom: 2%;
+	left: 1%;
+	background-color: black;
+	background-image: url("images/comp.png");
+	background-repeat: no-repeat;
+	background-position: center;
+	border: 5px solid grey;
+	border-radius: 30%;
+	
 }

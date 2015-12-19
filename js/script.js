@@ -2,6 +2,8 @@
 var canvas = document.getElementById("myCanvas");
 var backgroundCanvas = document.getElementById("bgCanvas");
 var playerCanvas = document.getElementById("playerCanvas");
+var pointsCanvas = document.getElementById("pointsCanvas");
+var points = pointsCanvas.getContext("2d");
 var player = playerCanvas.getContext("2d");
 var bg = backgroundCanvas.getContext("2d");
 var ctx = canvas.getContext("2d");
@@ -128,6 +130,12 @@ function drawLife() {
 	if (nbrOfLifes == 1) {
 		player.drawImage(warning, 10, playerHeight - 20, warningWidth, warningHeight); // Why -20 you ask? Because of reasons (which i know nothing of)
 	}
+}
+var pointsX = 0;
+function drawPoints() {
+	points.font = "25px Arial";
+	points.fillStyle = "Yellow";
+	points.fillText("Points: " + pointsX, 90, canvas.height - 10);
 }
 
 // Background
@@ -425,6 +433,7 @@ function laserMidCol() {
 				if (lasersXwing[i][0] < tieMidSquadron[j][0] + tieWidth && lasersXwing[i][0] + 2 > tieMidSquadron[j][0]) {
 					tieMidSquadron[j][2] = 0;
 					lasersXwing.splice(i, 1);
+					pointsX += 1;
 				}
 			}
 		}
@@ -440,6 +449,7 @@ function laserLeftCol() {
 				if (lasersXwing[i][0] < tieLeftSquadron[j][0] + tieWidth && lasersXwing[i][0] + 2 > tieLeftSquadron[j][0]) {
 					tieLeftSquadron[j][2] = 0;
 					lasersXwing.splice(i, 1);
+					pointsX += 1;
 				}
 			}
 		}
@@ -456,6 +466,7 @@ function laserRightCol() {
 				if (lasersXwing[i][0] < tieRightSquadron[j][0] + tieWidth && lasersXwing[i][0] + 2 > tieRightSquadron[j][0]) {
 					tieRightSquadron[j][2] = 0;
 					lasersXwing.splice(i, 1);
+					pointsX += 1;
 				}
 			}
 		}
@@ -571,8 +582,10 @@ function xWingRightCol() {
 function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	player.clearRect(0, 0, canvas.width, canvas.height);
+	points.clearRect(0, 0, canvas.width, canvas.height);
 	drawPlayer();
 	drawLife();
+	drawPoints();
 	addBg();
 	drawBg();
 	moveBg();
