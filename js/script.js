@@ -13,18 +13,23 @@ var topPressed = false;
 var bottomPressed = false;
 var spacePressed = false;
 
+// Important! Cooldowns on shots are in the DRAW function!
+
 // Boss data
-var bossCondition = 2;
-var bossHealth = 20;
+var bossCondition = 20;
+var bossHealth = 40;
 var bossWidth = 45;
 var bossHeight = 80;
 var bossX = canvas.width / 2 - bossWidth / 2 - 10; // Get centered already, god damn it!
 var bossY = - 200 - bossHeight;
+var bossLaserXSpeed = 1;
+var bossLaserYSpeed = 0.8;
+var bossSpeed = 0.5;
 
 // Player data
 var playerWidth = 250;
 var playerHeight = 85;
-var nbrOfLifes = 4; // Its -1, really
+var nbrOfLifes = 4; 
 var lifeWidth = 105;
 var lifeHeight = 40;
 var warningWidth = 280;
@@ -46,7 +51,7 @@ var squareHeight = 50;
 var xWingX = 120;
 var xWingY = 100;
 var xWingWidth = 35;
-var xWingHeight = 35;
+var xWingHeight = 22;
 var nbrOfShots = 0;
 
 // Tie Fighter data 
@@ -104,7 +109,7 @@ function keyDownHandler(e) {
 	}
 	else if(e.keyCode == 40) {
 		bottomPressed = true;
-	}
+	}	
 	else if(e.keyCode == 32) {
 		spacePressed = true;
 	}
@@ -132,11 +137,22 @@ function keyUpHandler(e) {
 function drawBoss() {
 	if (bossHealth > 0) {
 		ctx.drawImage(boss, bossX, bossY, bossWidth, bossHeight);
-		if (bossY < 0) {
+		if (bossY < 0) { // "Spawn"
 			bossY += 1;
 		}
 	}
 }
+
+function moveBoss() {
+	bossX += bossSpeed;
+	if (bossX + bossWidth >= canvas.width) {
+		bossSpeed = -bossSpeed;
+	} else if (bossX <= 0) {
+		bossSpeed = -bossSpeed;
+	}
+}
+
+// Boss mid lasers
 bossMidLasers = [];
 var shotBossMidCD = 20;
 function drawBossMidLaser() {
@@ -180,7 +196,97 @@ function addBossMidLaser() {
 function moveBossMidLaser() {
 	var n = bossMidLasers.length;
 	for (var i = 0; n > i; i++) {
-		bossMidLasers[i][1] += 1;
+		bossMidLasers[i][1] += bossLaserYSpeed;
+	}
+}
+
+// Boss left laser
+bossLeftLasers = [];
+var shotBossLeftCD = 20;
+function drawBossLeftLaser() {
+	var n = bossLeftLasers.length;
+	for (var i = 0; n > i; i++) {
+		ctx.beginPath();
+		ctx.rect(bossLeftLasers[i][0], bossLeftLasers[i][1], 2, 2);
+		ctx.fillStyle = "rgb(86,206,82)";
+		ctx.fill();
+		ctx.closePath();
+		if (bossLeftLasers[i][1] >= canvas.height) {
+			bossLeftLasers.splice(i, 1);
+		}
+	}
+	
+}
+
+function addBossLeftLaser() {
+	if (bossY >= 0 && shotBossLeftCD >= 20) {
+		var laserXOne = bossX;
+		var laserYOne = bossY + bossHeight / 2 - 10;
+		var laserXTwo = bossX + 10;
+		var laserYTwo = bossY + bossHeight / 2;
+		var laserXThree = bossX + 20;
+		var laserYThree = bossY + bossHeight / 2 - 20;
+		var laserStatus = 1
+		var bossLaserArrayOne = [laserXOne, laserYOne, laserStatus];
+		var bossLaserArrayTwo = [laserXTwo, laserYTwo, laserStatus];
+		var bossLaserArrayThree = [laserXThree, laserYThree, laserStatus];
+		bossLeftLasers.push(bossLaserArrayOne);
+		bossLeftLasers.push(bossLaserArrayTwo);
+		bossLeftLasers.push(bossLaserArrayThree);
+		shotBossLeftCD = 0;
+	}
+}
+
+function moveBossLeftLaser() {
+	var n = bossLeftLasers.length;
+	for (var i = 0; n > i; i++) {
+		bossLeftLasers[i][1] += bossLaserYSpeed;
+		bossLeftLasers[i][0] -= bossLaserXSpeed;
+	}
+}
+
+// Boss Right laser
+bossRightLasers = [];
+var shotBossRightCD = 20;
+function drawBossRightLaser() {
+	var n = bossRightLasers.length;
+	for (var i = 0; n > i; i++) {
+		ctx.beginPath();
+		ctx.rect(bossRightLasers[i][0], bossRightLasers[i][1], 2, 2);
+		ctx.fillStyle = "rgb(86,206,82)";
+		ctx.fill();
+		ctx.closePath();
+		if (bossRightLasers[i][1] >= canvas.height) {
+			bossRightLasers.splice(i, 1);
+		}
+	}
+	
+}
+
+function addBossRightLaser() {
+	if (bossY >= 0 && shotBossRightCD >= 20) {
+		var laserXOne = bossX + bossWidth;
+		var laserYOne = bossY + bossHeight / 2 - 10;
+		var laserXTwo = bossX + bossWidth - 10;
+		var laserYTwo = bossY + bossHeight / 2;
+		var laserXThree = bossX + bossWidth - 20;
+		var laserYThree = bossY + bossHeight / 2 - 20;
+		var laserStatus = 1
+		var bossLaserArrayOne = [laserXOne, laserYOne, laserStatus];
+		var bossLaserArrayTwo = [laserXTwo, laserYTwo, laserStatus];
+		var bossLaserArrayThree = [laserXThree, laserYThree, laserStatus];
+		bossRightLasers.push(bossLaserArrayOne);
+		bossRightLasers.push(bossLaserArrayTwo);
+		bossRightLasers.push(bossLaserArrayThree);
+		shotBossRightCD = 0;
+	}
+}
+
+function moveBossRightLaser() {
+	var n = bossRightLasers.length;
+	for (var i = 0; n > i; i++) {
+		bossRightLasers[i][1] += bossLaserYSpeed;
+		bossRightLasers[i][0] += bossLaserXSpeed;
 	}
 }
 
@@ -201,7 +307,7 @@ function drawLife() {
 var pointsX = 0;
 function drawPoints() {
 	points.font = "25px Arial";
-	points.fillStyle = "Yellow";
+	points.fillStyle = "rgb(141,163,63)";
 	points.fillText("Points: " + pointsX, 90, canvas.height - 10);
 }
 
@@ -550,11 +656,67 @@ function laserBossCol() {
 			if (lasersXwing[i][0] >= bossX && lasersXwing[i][0] <= bossX + bossWidth) {
 				lasersXwing.splice(i, 1);
 				bossHealth -= 1;
+				if (bossHealth <= 0) {
+					alert("You saved galaxy from The Evil Empire!")
+				}
 			}
 		}
 	}
 }
 
+// Collision with middle boss lasers 
+function bossMidLaserCol() {
+	var n = bossMidLasers.length;
+	for (var i = 0; n > i; i++) {
+		if (bossMidLasers[i][1] >= xWingY && bossMidLasers[i][1] <= xWingY + xWingHeight) {
+			if (bossMidLasers[i][0] > xWingX && bossMidLasers[i][0] < xWingX + xWingWidth) {
+				if (nbrOfLifes > 1) {
+					bossMidLasers.splice(i, 1);
+					nbrOfLifes -= 1;
+				} else {
+					alert("You lose.");
+					document.location.reload();
+				}
+			}
+		}
+	}
+}
+
+// Collision with left boss lasers 
+function bossLeftLaserCol() {
+	var n = bossLeftLasers.length;
+	for (var i = 0; n > i; i++) {
+		if (bossLeftLasers[i][1] >= xWingY && bossLeftLasers[i][1] <= xWingY + xWingHeight) {
+			if (bossLeftLasers[i][0] > xWingX && bossLeftLasers[i][0] < xWingX + xWingWidth) {
+				if (nbrOfLifes > 1) {
+					bossLeftLasers.splice(i, 1);
+					nbrOfLifes -= 1;
+				} else {
+					alert("You lose.");
+					document.location.reload();
+				}
+			}
+		}
+	}
+}
+
+// Collision with right boss lasers
+function bossRightLaserCol() {
+	var n = bossRightLasers.length;
+	for (var i = 0; n > i; i++) {
+		if (bossRightLasers[i][1] >= xWingY && bossRightLasers[i][1] <= xWingY + xWingHeight) {
+			if (bossRightLasers[i][0] > xWingX && bossRightLasers[i][0] < xWingX + xWingWidth) {
+				if (nbrOfLifes > 1) {
+					bossRightLasers.splice(i, 1);
+					nbrOfLifes -= 1;
+				} else {
+					alert("You lose.");
+					document.location.reload();
+				}
+			}
+		}
+	}
+}
 // Colision with middle tie lasers
 function tMidLaserCol() {
 	var n = tieMidLasers.length;
@@ -624,6 +786,15 @@ function moveXwing() {
 	}
 }
 
+// Collision with boss
+function xWingBossCol() {
+	if (xWingY <= bossY + bossHeight && xWingY + xWingHeight >= bossY) {
+		if (xWingX < bossX + bossWidth && xWingX + xWingWidth > bossX) {
+			alert("You crashed into the Empire Cruiser!");
+			document.location.reload();
+		}
+	}
+}
 // Colision with ties
 function xWingMidCol() {
 	var tie = tieMidSquadron.length;
@@ -660,6 +831,7 @@ function xWingRightCol() {
 		}
 	}
 }
+
 // Draw
 function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -671,18 +843,31 @@ function draw() {
 	addBg();
 	drawBg();
 	moveBg();
-// XWing colision with ties	
+// XWing colision with ties	and boss
 	xWingMidCol();
 	xWingLeftCol();
 	xWingRightCol();
+	xWingBossCol();
 	drawXwing();
 // Boss
 	if (pointsX >= bossCondition) {
 		drawBoss();
+		if (bossY >= 0) {
+			moveBoss();
+		}
 		laserBossCol();
+		// Mid lasers
 		drawBossMidLaser();
 		addBossMidLaser();
 		moveBossMidLaser();
+		// Left lasers
+		drawBossLeftLaser();
+		addBossLeftLaser();
+		moveBossLeftLaser();
+		// Right lasers
+		drawBossRightLaser();
+		addBossRightLaser();
+		moveBossRightLaser();
 	}
 
 // Left Tie functions 
@@ -706,7 +891,11 @@ function draw() {
 // XWing's colision with tie lasers
 	tMidLaserCol();
 	tLeftLaserCol();
-	tRightLaserCol(); 
+	tRightLaserCol();
+// XWing's collision with boss lasers
+	bossRightLaserCol();
+	bossMidLaserCol();
+	bossLeftLaserCol();
 	moveXwing();
 	pressLaser();
 	moveLaser();
@@ -720,7 +909,8 @@ function draw() {
 	shotLeftTCD += 0.4; // Cooldown on left tie shots
 	shotRightTCD += 0.4; // Cooldown on right tie shots
 	shotBossMidCD += 0.3; // Cooldown on middle boss shots
+	shotBossLeftCD += 0.5; // Cooldown on left boss shots
+	shotBossRightCD += 0.5;  // Cooldown on right boss shots
 }
-
 
 setInterval(draw, 15);
