@@ -12,6 +12,7 @@ var leftPressed = false;
 var topPressed = false;
 var bottomPressed = false;
 var spacePressed = false;
+var $announcement = $("#announcement");
 
 // Important! Cooldowns on shots are in the DRAW function!
 
@@ -29,7 +30,7 @@ var bossSpeed = 0.5;
 // Player data
 var playerWidth = 250;
 var playerHeight = 85;
-var nbrOfLifes = 4; 
+var nbrOfLifes = 4;
 var lifeWidth = 105;
 var lifeHeight = 40;
 var warningWidth = 280;
@@ -54,7 +55,7 @@ var xWingWidth = 35;
 var xWingHeight = 22;
 var nbrOfShots = 0;
 
-// Tie Fighter data 
+// Tie Fighter data
 var tieX = 120;
 var tieY = 0;
 var tieWidth = 24;
@@ -66,10 +67,10 @@ var tieRightHeight = 28;
 
 // Images
 var xWing = new Image();
-xWing.src = 'css/images/xwing.png'; 
+xWing.src = 'css/images/xwing.png';
 
 var tie = new Image();
-tie.src = 'css/images/tief.png'; 
+tie.src = 'css/images/tief.png';
 
 var bgImg = new Image();
 bgImg.src = 'css/images/bg.jpg';
@@ -109,7 +110,7 @@ function keyDownHandler(e) {
 	}
 	else if(e.keyCode == 40) {
 		bottomPressed = true;
-	}	
+	}
 	else if(e.keyCode == 32) {
 		spacePressed = true;
 	}
@@ -118,7 +119,7 @@ function keyDownHandler(e) {
 function keyUpHandler(e) {
     if(e.keyCode == 39) {
         rightPressed = false;
-    }	
+    }
     else if(e.keyCode == 37) {
         leftPressed = false;
     }
@@ -167,7 +168,7 @@ function drawBossMidLaser() {
 			bossMidLasers.splice(i, 1);
 		}
 	}
-	
+
 }
 
 function addBossMidLaser() {
@@ -215,7 +216,7 @@ function drawBossLeftLaser() {
 			bossLeftLasers.splice(i, 1);
 		}
 	}
-	
+
 }
 
 function addBossLeftLaser() {
@@ -260,7 +261,7 @@ function drawBossRightLaser() {
 			bossRightLasers.splice(i, 1);
 		}
 	}
-	
+
 }
 
 function addBossRightLaser() {
@@ -314,7 +315,7 @@ function drawPoints() {
 // Background
 var bgArray = [];
 
-function addBg() { 
+function addBg() {
 	for (var i = 1; bgWTimes >= i; i++ ) {
 		for (var j = 1; bgHTimes >= j; j++ ) {
 			if (bgArray.length < bgHTimes * bgWTimes) {  // Remember that empty background? Yep, this line
@@ -347,7 +348,7 @@ function drawBg() {
 
 // Tie Fighter Functions.
 
-// Left Squadron 
+// Left Squadron
 tieLeftSquadron = [];
 function drawLeftTie() {
 	var n = tieLeftSquadron.length;
@@ -365,7 +366,7 @@ function drawLeftTie() {
 function addLeftTie() {
 	var n = canvas.width / 5;
 	var tie = tieLeftSquadron.length; // Only 5 ties please!
-	
+
 	if (tie < 5 && pointsX < bossCondition) {
 		for (var i = 1; 5 >= i; i++) {
 			var t = [- tieLeftWidth * i * 2, - 100 - tieLeftHeight * i, 1, 1]; // Magical numbers to adjust it a bit | x, y, status, type
@@ -420,7 +421,7 @@ tieMidSquadron = [];
 function drawMidTie() {
 	var n = tieMidSquadron.length;
 	for (var i = 0; n > i; i++) {
-		tieMidSquadron[i][1] += 1; //Before drawing so you they actually end up being deleted
+		tieMidSquadron[i][1] += 0.7; //Before drawing so they actually end up being deleted
 		if (tieMidSquadron[i][2] == 1) {
 			ctx.drawImage(tie, tieMidSquadron[i][0], tieMidSquadron[i][1], tieWidth, tieHeight);
 		}
@@ -432,7 +433,7 @@ function drawMidTie() {
 function addMidTie() {
 	var n = canvas.width / 5;
 	var tie = tieMidSquadron.length; // Only 5 ties please!
-	
+
 	if (tie < 5 && pointsX < bossCondition) {
 		for (var i = 1; 5 >= i; i++) {
 			var t = [n * i - tieWidth * 1.5, -tieHeight, 1, 2]; // 1.5 is to center it a bit, delete later on | x, y, status, type
@@ -485,8 +486,8 @@ tieRightSquadron = [];
 function drawRightTie() {
 	var n = tieRightSquadron.length;
 	for (var i = 0; n > i; i++) {
-		tieRightSquadron[i][0] -= 1;
-		tieRightSquadron[i][1] += 1; //Before drawing so you they actually end up being deleted
+		tieRightSquadron[i][0] -= 0.8;
+		tieRightSquadron[i][1] += 0.8; //Before drawing so they actually end up being deleted
 		if (tieRightSquadron[i][2] == 1) {
 			ctx.drawImage(tieRight, tieRightSquadron[i][0], tieRightSquadron[i][1], tieRightWidth, tieRightHeight);
 		}
@@ -498,13 +499,13 @@ function drawRightTie() {
 function addRightTie() {
 	var n = canvas.width / 5;
 	var tie = tieRightSquadron.length; // Only 5 ties please!
-	
+
 	if (tie < 5 && pointsX < bossCondition) {
 		for (var i = 1; 5 >= i; i++) {
 			var t = [canvas.width + tieRightWidth * i * 2, - 150 - tieRightHeight * i, 1, 3]; // Why is it diffrent than left one? No idea | x, y, status, type
 			tieRightSquadron.push(t);
 		}
-	}	
+	}
 }
 
 tieRightLasers = [];
@@ -572,7 +573,7 @@ function addLaser() {
 			var laserY = xWingY;
 			var status = 1;
 			var ugh = [laserX, laserY, status];
-			lasersXwing.push(ugh);	
+			lasersXwing.push(ugh);
 			nbrOfShots += 1; // Shooting from both sides
 			shotCD = 0; // Reset on cooldown
 	}
@@ -657,14 +658,18 @@ function laserBossCol() {
 				lasersXwing.splice(i, 1);
 				bossHealth -= 1;
 				if (bossHealth <= 0) {
-					alert("You saved galaxy from The Evil Empire!")
+					$updateText("You saved galaxy from The Evil Empire!");
+          $announcement.find("h1").text("Rebel Alliance wins!");
+          $announcement.find("img").attr("src", "css/images/alliance.png");
+          $announcement.find("button").text("Play again?");
+          $announcement.show();
 				}
 			}
 		}
 	}
 }
 
-// Collision with middle boss lasers 
+// Collision with middle boss lasers
 function bossMidLaserCol() {
 	var n = bossMidLasers.length;
 	for (var i = 0; n > i; i++) {
@@ -674,15 +679,15 @@ function bossMidLaserCol() {
 					bossMidLasers.splice(i, 1);
 					nbrOfLifes -= 1;
 				} else {
-					alert("You lose.");
-					document.location.reload();
+          $updateText("You got shot down by the Empire Cruiser.");
+          $announcement.show();
 				}
 			}
 		}
 	}
 }
 
-// Collision with left boss lasers 
+// Collision with left boss lasers
 function bossLeftLaserCol() {
 	var n = bossLeftLasers.length;
 	for (var i = 0; n > i; i++) {
@@ -692,8 +697,8 @@ function bossLeftLaserCol() {
 					bossLeftLasers.splice(i, 1);
 					nbrOfLifes -= 1;
 				} else {
-					alert("You lose.");
-					document.location.reload();
+          $updateText("You got shot down by the Empire Cruiser.");
+          $announcement.show();
 				}
 			}
 		}
@@ -710,8 +715,8 @@ function bossRightLaserCol() {
 					bossRightLasers.splice(i, 1);
 					nbrOfLifes -= 1;
 				} else {
-					alert("You lose.");
-					document.location.reload();
+          $updateText("You got shot down by the Empire Cruiser.");
+          $announcement.show();
 				}
 			}
 		}
@@ -727,8 +732,8 @@ function tMidLaserCol() {
 					tieMidLasers.splice(i, 1);
 					nbrOfLifes -= 1;
 				} else {
-					alert("You lose.");
-					document.location.reload();
+          $updateText("You got shot down by the Tie Fighter.");
+          $announcement.show();
 				}
 			}
 		}
@@ -745,8 +750,8 @@ function tLeftLaserCol() {
 					tieLeftLasers.splice(i, 1);
 					nbrOfLifes -= 1;
 				} else {
-					alert("You lose.");
-					document.location.reload();
+          $updateText("You got shot down by the Tie Fighter.");
+          $announcement.show();
 				}
 			}
 		}
@@ -763,8 +768,8 @@ function tRightLaserCol() {
 					tieRightLasers.splice(i, 1);
 					nbrOfLifes -= 1;
 				} else {
-					alert("You lose.");
-					document.location.reload();
+          $updateText("You got shot down by the Tie Fighter.");
+          $announcement.show();
 				}
 			}
 		}
@@ -790,8 +795,8 @@ function moveXwing() {
 function xWingBossCol() {
 	if (xWingY <= bossY + bossHeight && xWingY + xWingHeight >= bossY) {
 		if (xWingX < bossX + bossWidth && xWingX + xWingWidth > bossX) {
-			alert("You crashed into the Empire Cruiser!");
-			document.location.reload();
+      $updateText("You crashed into Empire Cruiser.");
+      $announcement.show();
 		}
 	}
 }
@@ -801,8 +806,8 @@ function xWingMidCol() {
 	for (var i = 0; tie > i; i++) {
 		if (xWingY <= tieMidSquadron[i][1] + tieHeight && xWingY + xWingHeight >= tieMidSquadron[i][1] && tieMidSquadron[i][2] == 1) {
 			if (xWingX < tieMidSquadron[i][0] + tieWidth && xWingX + xWingWidth > tieMidSquadron[i][0]) {
-				alert("You crashed into the Tie Fighter!");
-				document.location.reload();
+        $updateText("You crashed into the Tie Fighter.");
+        $announcement.show();
 			}
 		}
 	}
@@ -813,8 +818,8 @@ function xWingLeftCol() {
 	for (var i = 0; tie > i; i++) {
 		if (xWingY <= tieLeftSquadron[i][1] + tieHeight && xWingY + xWingHeight >= tieLeftSquadron[i][1] && tieLeftSquadron[i][2] == 1) {
 			if (xWingX < tieLeftSquadron[i][0] + tieWidth && xWingX + xWingWidth > tieLeftSquadron[i][0]) {
-				alert("You crashed into the Tie Fighter!");
-				document.location.reload();
+        $updateText("You crashed into the Tie Fighter.");
+        $announcement.show();
 			}
 		}
 	}
@@ -825,8 +830,8 @@ function xWingRightCol() {
 	for (var i = 0; tie > i; i++) {
 		if (xWingY <= tieRightSquadron[i][1] + tieHeight && xWingY + xWingHeight >= tieRightSquadron[i][1] && tieRightSquadron[i][2] == 1) {
 			if (xWingX < tieRightSquadron[i][0] + tieWidth && xWingX + xWingWidth > tieRightSquadron[i][0]) {
-				alert("You crashed into the Tie Fighter!");
-				document.location.reload();
+        $updateText("You crashed into the Tie Fighter.");
+        $announcement.show();
 			}
 		}
 	}
@@ -870,7 +875,7 @@ function draw() {
 		moveBossRightLaser();
 	}
 
-// Left Tie functions 
+// Left Tie functions
 	addLeftTie();
 	drawLeftTie();
 	addLeftTLaser();
@@ -905,12 +910,18 @@ function draw() {
 	laserLeftCol();
 	laserRightCol();
 	shotCD += 2;	// Cooldown reset on XWing shots
-	shotMidTCD += 0.5;	// Cooldown on tie shots
-	shotLeftTCD += 0.4; // Cooldown on left tie shots
-	shotRightTCD += 0.4; // Cooldown on right tie shots
+	shotMidTCD += 0.3;	// Cooldown on tie shots
+	shotLeftTCD += 0.2; // Cooldown on left tie shots
+	shotRightTCD += 0.2; // Cooldown on right tie shots
 	shotBossMidCD += 0.3; // Cooldown on middle boss shots
 	shotBossLeftCD += 0.5; // Cooldown on left boss shots
 	shotBossRightCD += 0.5;  // Cooldown on right boss shots
 }
-
-setInterval(draw, 15);
+function $updateText(text) {
+  $announcement.find("p").text(text);
+  clearInterval(drawMe);
+}
+$announcement.find("button").on("click", function() {
+  document.location.reload();
+})
+var drawMe = setInterval(draw, 15);

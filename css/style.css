@@ -12,21 +12,61 @@
 	float: left;
 	width: 75%;
 	height: 100%;
+	position: relative;
 }
 #myCanvas {
 	background: transparent;
 	border: 5px solid rgb(43, 96, 154);
-	width: 70%;
+	width: 100%;
 	height: 95%;
 	position: absolute;
 	top: 2%;
 }
 #bgCanvas {
-	width: 70%;
+	width: 100%;
 	height: 95%;
 	border: 5px solid rgb(43, 96, 154);
 	position: absolute;
 	top: 2%;
+}
+#announcement {
+	width: 55%;
+	height: 30%;
+	background-color: black;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 1em;
+	box-sizing: border-box;
+	display: none;
+}
+#announcement img {
+	height: 100%;
+	float: left;
+}
+#announcement div {
+	float: left;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	margin-left: 1em;
+	text-align: center;
+}
+#announcement p {
+	font-family: impact;
+	font-size: 1.2em;
+	color: white;
+}
+#announcement h1 {
+	font-family: impact;
+	font-size: 2em;
+	color: white;
+}
+#announcement button {
+	padding: 0.5em 1em;
+	margin-top: 0.5em;
+	font-family: impact;
 }
 #playerCanvas {
 	margin-top: 20px;
